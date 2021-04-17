@@ -20,12 +20,12 @@ def objective_function(O):
     z = (1 - x) ** 2 + 100 * (y - x ** 2) ** 2 + p1 + p2
     return z
   
-bounds = [(-1.5, 1.5), (-0.5, 2.5)]  # upper and lower bounds of variables
+boundary = [(-1.5, 1.5), (-0.5, 2.5)]  # upper and lower bounds of variables
 nvar = 2  # number of variables
 maxmin = -1  # if minimization problem, mm = -1; if maximization problem, mm = 1
   
 # parameters OF PSO
-particle_size = 120  # number of particles
+nparticle = 120  # number of particles
 iterations = 200  # max number of iterations
 w = 0.8  # inertial coefficient
 c1 = 1  # Personal Acceleration Coefficient
@@ -37,10 +37,10 @@ ax = fig.add_subplot()
 fig.show()
 plt.title('Optimizing Solution: ')
 plt.xlabel("Number of Iterations")
-plt.ylabel("Objective function value")
-# ------------------------------------------------------------------------------
+plt.ylabel("Objective Function Value")
+
 class Particle:
-    def __init__(self, bounds):
+    def __init__(self, boundary):
         self.particle_position = []  # particle position
         self.particle_velocity = []  # particle velocity
         self.local_best_particle_position = []  # best position of particle
@@ -48,7 +48,7 @@ class Particle:
         self.p_particle_position = initial_p
         
         for i in range(nvar):
-            self.particle_position.append(random.uniform(bounds[i][0],bounds[i][1]))
+            self.particle_position.append(random.uniform(boundary[i][0],boundary[i][1]))
             self.particle_velocity.append(random.uniform(-1,1))
   
     def evaluate(self, objective_function):
@@ -72,28 +72,28 @@ class Particle:
             social_velocity = c2 * r2 * (global_best_particle_position[i] - self.particle_position[i])
             self.particle_velocity[i] = w * self.particle_velocity[i] + personal_velocity + social_velocity
   
-    def update_position(self, bounds):
+    def update_position(self, boundary):
         for i in range(nvar):
             self.particle_position[i] = self.particle_position[i] + self.particle_velocity[i]
   
-            # check and repair to satisfy the upper bounds
-            if self.particle_position[i] > bounds[i][1]:
-                self.particle_position[i] = bounds[i][1]
-            # check and repair to satisfy the lower bounds
-            if self.particle_position[i] < bounds[i][0]:
-                self.particle_position[i] = bounds[i][0]
+            # check and repair to satisfy the upper boundary
+            if self.particle_position[i] > boundary[i][1]:
+                self.particle_position[i] = boundary[i][1]
+            # check and repair to satisfy the lower boundary
+            if self.particle_position[i] < boundary[i][0]:
+                self.particle_position[i] = boundary[i][0]
   
 class PSO:
-    def __init__(self, objective_function, bounds, particle_size, iterations):
+    def __init__(self, objective_function, boundary, nparticle, iterations):
         p_global_best_particle_position = initial_p
         global_best_particle_position = []
         sp = []
-        for i in range(particle_size):
-            sp.append(Particle(bounds))
+        for i in range(nparticle):
+            sp.append(Particle(boundary))
         A = []
         
         for i in range(iterations):
-            for j in range(particle_size):
+            for j in range(nparticle):
                 sp[j].evaluate(objective_function)
                 
                 if maxmin == -1:
@@ -104,9 +104,9 @@ class PSO:
                     if sp[j].p_particle_position < p_global_best_particle_position:
                         global_best_particle_position = list(sp[j].particle.position)
                         p_global_best_particle_position = float(sp[j].p_particle_position)
-            for j in range(particle_size):
+            for j in range(nparticle):
                 sp[j].update_velocity(global_best_particle_position)
-                sp[j].update_position(bounds)
+                sp[j].update_position(boundary)
                 
             A.append(p_global_best_particle_position)
             print('Iteration #: ', i, ' value: ', p_global_best_particle_position)
@@ -124,5 +124,5 @@ if maxmin == -1:
 if maxmin == 1:
     initial_p = -float("inf")
 
-PSO(objective_function, bounds, particle_size, iterations)
+PSO(objective_function, boundary, nparticle, iterations)
 plt.show()
