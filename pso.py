@@ -17,7 +17,7 @@ def objective_function(O):
     else:
         p2 = 0
     #z is the objective function it minimizes based on variables x and y 
-    z = (1 - x) ** 2 + 100 * (y - x ** 2) ** 2 + p1 + p2
+    z = 1 + (x ** 2 + y ** 2) -y + p1 + p2
     return z
   
 boundary = [(-1.5, 1.5), (-0.5, 2.5)]  # upper and lower bounds of variables
