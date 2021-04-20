@@ -8,12 +8,16 @@ with open('breast_cancer_data.txt', 'r') as f:
     lines = f.readlines()
     for line in lines:
         data = line.replace('\n', '').split(',')
-        #print(data)
+        for d in data:
+            if d == '?':
+                del data
+        print(data)
         del data[0]
         x.append(data[0:9])
         y.append(data[9])
-x = np.array(x, dtype='uint32')
-y = np.array(y, dtype='uint32')
+
+x = np.array(x,dtype='uint32')
+y = np.array(y,dtype='uint32')
 print(x.shape)
 print(y.shape)
 
@@ -25,17 +29,14 @@ num_samples = 699
 
 def logits_function(p):
     """ Calculate roll-back the weights and biases
-
     Inputs
     ------
     p: np.ndarray
         The dimensions should include an unrolled version of the
         weights and biases.
-
     Returns
     -------
     numpy.ndarray of logits for layer 2
-
     """
     # Roll-back the weights and biases
     W1 = p[0:180].reshape((n_inputs,n_hidden))
@@ -47,21 +48,18 @@ def logits_function(p):
     z1 = x.dot(W1) + b1  # Pre-activation in Layer 1
     a1 = np.tanh(z1)     # Activation in Layer 1
     logits = a1.dot(W2) + b2 # Pre-activation in Layer 2
-    return logits 
+    return logits
 
 # Forward propagation
 def forward_prop(params):
     """Forward propagation as objective function
-
     This computes for the forward propagation of the neural network, as
     well as the loss.
-
     Inputs
     ------
     params: np.ndarray
         The dimensions should include an unrolled version of the
         weights and biases.
-
     Returns
     -------
     float
@@ -83,12 +81,10 @@ def forward_prop(params):
 def f(x):
     """Higher-level method to do forward_prop in the
     whole swarm.
-
     Inputs
     ------
     x: numpy.ndarray of shape (n_particles, dimensions)
         The swarm that will perform the search
-
     Returns
     -------
     numpy.ndarray of shape (n_particles, )
@@ -110,7 +106,6 @@ cost, pos = optimizer.optimize(f, iters=200)
 def predict(pos):
     """
     Use the trained weights to perform class predictions.
-
     Inputs
     ------
     pos: numpy.ndarray
@@ -122,4 +117,3 @@ def predict(pos):
     return y_pred
 
 print((predict(pos) == y).mean())
-
