@@ -8,13 +8,17 @@ with open('breast_cancer_data.txt', 'r') as f:
     lines = f.readlines()
     for line in lines:
         data = line.replace('\n', '').split(',')
+        g = 1
         for d in data:
             if d == '?':
-                del data
-        print(data)
-        del data[0]
-        x.append(data[0:9])
-        y.append(data[9])
+                g = 0
+        if g == 0:
+            del data
+        else:
+            print(data)
+            del data[0]
+            x.append(data[0:9])
+            y.append(data[9])
 
 x = np.array(x,dtype='uint32')
 y = np.array(y,dtype='uint32')
@@ -24,7 +28,7 @@ print(y.shape)
 n_inputs = 9
 n_hidden = 20
 n_classes = 2
-num_samples = 699
+num_samples = 683
 
 
 def logits_function(p):
