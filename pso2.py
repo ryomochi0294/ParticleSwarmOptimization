@@ -52,6 +52,7 @@ def logits_function(p):
     z1 = x.dot(W1) + b1  # Pre-activation in Layer 1
     a1 = np.tanh(z1)     # Activation in Layer 1
     logits = a1.dot(W2) + b2 # Pre-activation in Layer 2
+    print(logits)
     return logits
 
 # Forward propagation
@@ -74,12 +75,12 @@ def forward_prop(params):
 
     # Compute for the softmax of the logits
     exp_scores = np.exp(logits)
-    probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+    probs = exp_scores / np.sum(exp_scores, axis=2, keepdims=True)
 
     # Compute for the negative log
     corect_logprobs = -np.log(probs[range(num_samples), y])
     loss = np.sum(corect_logprobs) / num_samples
-
+    print(loss)
     return loss
 
 def f(x):
@@ -102,8 +103,9 @@ options = {'c1': 0.5, 'c2': 0.3, 'w':0.9}
 
 # Call instance of PSO
 dimensions = (n_inputs * n_hidden) + (n_hidden * n_classes) + n_hidden + n_classes
+#print(dimensions)
 optimizer = ps.single.GlobalBestPSO(n_particles=100, dimensions=dimensions, options=options)
-
+#print(optimizer)
 # Perform optimization
 cost, pos = optimizer.optimize(f, iters=200)
 
