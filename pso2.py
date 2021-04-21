@@ -9,16 +9,15 @@ with open('breast_cancer_data.txt', 'r') as f:
     for line in lines:
         data = line.replace('\n', '').split(',')
         g = 1
+        count = 0
         for d in data:
+            count = count + 1
             if d == '?':
-                g = 0
-        if g == 0:
-            del data
-        else:
-            print(data)
-            del data[0]
-            x.append(data[0:9])
-            y.append(data[9])
+                data[count-1] = 5
+        print(data)
+        del data[0]
+        x.append(data[0:9])
+        y.append(data[9])
 
 x = np.array(x,dtype='uint32')
 y = np.array(y,dtype='uint32')
@@ -28,7 +27,7 @@ print(y.shape)
 n_inputs = 9
 n_hidden = 20
 n_classes = 2
-num_samples = 683
+num_samples = 699
 
 
 def logits_function(p):
@@ -75,12 +74,12 @@ def forward_prop(params):
 
     # Compute for the softmax of the logits
     exp_scores = np.exp(logits)
-    probs = exp_scores / np.sum(exp_scores, axis=2, keepdims=True)
+    probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
 
     # Compute for the negative log
     corect_logprobs = -np.log(probs[range(num_samples), y])
     loss = np.sum(corect_logprobs) / num_samples
-    print(loss)
+    #print(loss)
     return loss
 
 def f(x):
