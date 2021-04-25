@@ -1,38 +1,47 @@
 import random
 import time
 import matplotlib.pyplot as plt
-Pt = 4
+Pt = 4      #Transmitter power in dbm
 Pr = 69     #RSSI
-x0 = 0
-y0 = 0
-alpha = 2
+x0 = 0      #x position of the observer
+y0 = 0      #y position of the observer
+alpha = 2   #constant coefficient for shadowing (Object in the way like walls, window, etc)
+x = 0
+y = 0
+s = 0
+gx = []
+gy = []
+hx = []
+hy = []
+
 def objective_function(O):
     x = O[0]     #x-value of particle position
     y = O[1]     #y-value of particle position
 
     #z is the objective function it minimizes based on variables x and y 
-    z = (Pr*((x0 - x)**2 + (y0 - y)**2)**(alpha/2)-Pt)**2
+    z = s + (Pr*((x0 - x)**2 + (y0 - y)**2)**(alpha/2)-Pt)**2
     return z
 
-boundary = [(-30, 30), (-30, 30)]  # upper and lower bounds of variables
+boundary = [(-100, 100), (-100, 100)]  # upper and lower bounds of variables
 nvar = 2  # number of variables
 maxmin = -1  # if minimization problem, mm = -1; if maximization problem, mm = 1
 
 # parameters OF PSO
-nparticle = 120  # number of particles
-iterations = 200  # max number of iterations
-w = 0.8  # inertial coefficient
-c1 = 1  # Personal Acceleration Coefficient
+nparticle = 100  # number of particles
+iterations = 50  # max number of iterations
+w = 0.9  # inertial coefficient
+c1 = 2  # Personal Acceleration Coefficient
 c2 = 2  # Social Acceleration Coefficient
 
 # Visuals
+"""
 fig = plt.figure()
 ax = fig.add_subplot()
 fig.show()
 plt.title('Optimizing Solution: ')
 plt.xlabel("Number of Iterations")
 plt.ylabel("Objective Function Value")
-
+"""
 class Particle:
     def __init__(self, boundary):
         self.particle_position = []  # particle position
@@ -78,7 +87,7 @@ class Particle:
                 self.particle_position[i] = boundary[i][0]
 
 class PSO:
-    def __init__(self, objective_function, boundary, nparticle, iterations):
+    def __new__(self, objective_function, boundary, nparticle, iterations):
         p_global_best_particle_position = initial_p
         global_best_particle_position = []
         sp = []
@@ -111,12 +120,57 @@ class PSO:
         print('Final Result: ')
         print('Optimized solution: ', global_best_particle_position)
         print('Objective function value: ', p_global_best_particle_position)
+        z = objective_function(global_best_particle_position)
+        gx.append(global_best_particle_position[0])
+        gy.append(global_best_particle_position[1])  
+        return z
 
 if maxmin == -1:
     initial_p = float("inf")
 
 if maxmin == 1:
     initial_p = -float("inf")
+count = 0
+while(1):
+    count += 1
+    fig = plt.figure(1)
+    ax = fig.add_subplot()
+    fig.show()
+    plt.title('Optimizing Solution: ')
+    plt.xlabel("Number of Iterations")
+    plt.ylabel("Objective Function Value")
+    x0 = input("Your x coordinate: ")
+    print(x0)
+    y0 = input("Your y coordinate: ")
+    print(y0)
+    Pr = input("Measured RSSI Value: ")
+    print(Pr)
+    x0 = float(x0)
+    y0 = float(y0)
+    Pr = float(Pr)
+    s = s + PSO(objective_function, boundary, nparticle, iterations)
+    s = float(s)
+    hx.append(x0)
+    hy.append(y0)
+    plt.title('Optimizing Solution: ')
+    plt.xlabel("Number of Iterations")
+    plt.ylabel("Objective Function Value")
+    plt.show()
+    
+    fig = plt.figure(2)
+    ax = fig.add_subplot(212)
+    fig.show()
+    ax.scatter(gx, gy, label= "stars", color= "green", 
+            marker= "*", s=30)
+    ax.scatter(hx, hy, label= "o", color= "blue", 
+            marker= "o", s=30)
+    plt.xlabel('x - axis')
+    # frequency label
+    plt.ylabel('y - axis')
+    # plot title
+    plt.title('My scatter plot!')
+    # showing legend
+    plt.legend()
+    plt.show()
 
-PSO(objective_function, boundary, nparticle, iterations)
-plt.show()
+    
