@@ -1,37 +1,49 @@
 import random
 import time
 import matplotlib.pyplot as plt
-Pt = 4      #Transmitter power in dbm
-Pr = 69     #RSSI
+Pt = -18      #Transmitter power in dbm
+Pt = (1000)*(10**(Pt/10))
+Pr = -69     #RSSI
+Pr = (1000)*(10**(Pr/10))
 x0 = 0      #x position of the observer
 y0 = 0      #y position of the observer
-alpha = 2   #constant coefficient for shadowing (Object in the way like walls, window, etc)
-x = 0
-y = 0
+alpha = 3   #constant coefficient for shadowing (Object in the way like walls, window, etc)
+x = 13
+y = 12
 s = 0
 gx = []
 gy = []
 hx = []
 hy = []
+s1 = 0
+s2 = 0
+s4 = 0
+g1 = 0
+g2 = 0
+g3 = 0
+p1 = 0
+p2 = 0
+p3 = 0
 
 def objective_function(O):
-    x = O[0]     #x-value of particle position
-    y = O[1]     #y-value of particle position
+    xx = O[0]     #x-value of particle position
+    yy = O[1]     #y-value of particle position
 
     #z is the objective function it minimizes based on variables x and y 
-    z = s + (Pr*((x0 - x)**2 + (y0 - y)**2)**(alpha/2)-Pt)**2
+    z = s + (Pr*((xx - x0)**2 + (yy - y0)**2)**(alpha/2)-Pt)**2
+    #print(z)
     return z
 
-boundary = [(-100, 100), (-100, 100)]  # upper and lower bounds of variables
+boundary = [(-30, 30), (-30, 30)]  # upper and lower bounds of variables
 nvar = 2  # number of variables
 maxmin = -1  # if minimization problem, mm = -1; if maximization problem, mm = 1
 
 # parameters OF PSO
 nparticle = 100  # number of particles
 iterations = 50  # max number of iterations
-w = 0.9  # inertial coefficient
-c1 = 2  # Personal Acceleration Coefficient
-c2 = 2  # Social Acceleration Coefficient
+w = 0.7  # inertial coefficient
+c1 = 2.05  # Personal Acceleration Coefficient
+c2 = 3.2  # Social Acceleration Coefficient
 
 # Visuals
 """
@@ -148,6 +160,7 @@ while(1):
     x0 = float(x0)
     y0 = float(y0)
     Pr = float(Pr)
+    Pr = (1000)*(10**(Pr/10))
     s = s + PSO(objective_function, boundary, nparticle, iterations)
     s = float(s)
     hx.append(x0)
@@ -160,15 +173,33 @@ while(1):
     fig = plt.figure(2)
     ax = fig.add_subplot(212)
     fig.show()
-    ax.scatter(gx, gy, label= "stars", color= "green", 
-            marker= "*", s=30)
-    ax.scatter(hx, hy, label= "o", color= "blue", 
-            marker= "o", s=30)
-    plt.xlabel('x - axis')
+    sumx = 0
+    sumy = 0
+    for i in gx:
+        sumx = sumx + i
+    sumx = sumx / len(gx)
+    for j in gy:
+        sumy = sumy + j
+    sumy = sumy / len(gy)
+    ax.scatter(sumx, sumy, label="stars", color="green",marker="*", s=30)
+    ax.scatter(hx, hy, label= "o", color= "blue", marker= "o", s=30)
+    p = 0
+    q = 0
+    i = 1
+    a = len(gx)
+    while i < a:
+        p += gx[i-1]
+        q += gy[i-1]
+        i += 1
+    p = p/a
+    q = q/a
+    ax.scatter(hx, hy, label= "o", color= "blue", marker= "o", s=30)
+    
+    plt.xlabel('x - axis (meters)')
     # frequency label
-    plt.ylabel('y - axis')
+    plt.ylabel('y - axis (meters)')
     # plot title
-    plt.title('My scatter plot!')
+    plt.title('Map')
     # showing legend
     plt.legend()
     plt.show()
